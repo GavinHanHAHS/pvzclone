@@ -13,20 +13,6 @@ from pygame.locals import (
     QUIT,
 )
 
-# initialize pygame
-pygame.init()
-
-# Define constants for screen width/height
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
-# Create the screen object; size determined by screen constants
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("PvZClone")
-
-# Setup the clock for a decent framerate
-clock = pygame.time.Clock()
-
 
 # Define a tower object by extending pygame.sprite.Sprite
 # the surface(s) drawn on the screen is an attribute of "Tower"
@@ -56,6 +42,47 @@ class Tower(pygame.sprite.Sprite):
             pass
 
 
+class Text(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Text, self).__init__()
+        self.value = "hold"
+        self.font = pygame.font.SysFont("arial", 30)
+        self.text = self.font.render(self.value, True, (0, 0, 0), (255, 255, 255))
+        self.rect = self.text.get_rect(topleft=(100, 300))
+
+    def update(self, newValue):
+        self.value = newValue
+        self.text = self.font.render(self.value, True, (0, 0, 0), (255, 255, 255))
+
+
+# initialize pygame
+pygame.init()
+
+
+# GLOBAL VARIABLES
+# Define constants for screen width/height
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+# Create the screen object; size determined by screen constants
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("PvZClone")
+
+# Setup the clock for a decent framerate
+clock = pygame.time.Clock()
+
+# Add a grid that has towers inserted into it. (row, column) format
+# --> should this be an arena object?
+arena = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+pink = (227, 143, 224)
+
+debug = Text()
+
 # Define a group to hold
 # * all sprites for drawing
 # * all towers for logic
@@ -82,14 +109,23 @@ while running:
 
     # DRAWING
     # Wipe Screen to help Drawing
-    screen.fill((255, 255, 255))
+    screen.fill((220, 220, 220))
+
+    # Draw filler elements
+    pygame.draw.rect(screen, pink, pygame.Rect(0, 0, 100, SCREEN_HEIGHT))
+    pygame.draw.rect(screen, pink, pygame.Rect(0, 0, SCREEN_WIDTH, 100))
+    pygame.draw.rect(screen, pink, pygame.Rect(0, SCREEN_HEIGHT-50, SCREEN_WIDTH, 50))
+    pygame.draw.rect(screen, pink, pygame.Rect(SCREEN_WIDTH-25, 0, 25, SCREEN_HEIGHT))
 
     # Check over every sprite in sprite group all_sprites -> Draw them
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
+    screen.blit(debug.text, debug.rect)
 
     # Update Tower Logic
     towers.update()
+    x, y = pygame.mouse.get_pos()
+    debug.update(str(x) + " " + str(y))
 
     # Update the display
     pygame.display.flip()
