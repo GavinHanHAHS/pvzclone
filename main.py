@@ -5,6 +5,7 @@
 # import packages needed for project
 
 import pygame
+import math
 
 # Import pygame.locals for easier access to key coordinates
 from pygame.locals import (
@@ -31,15 +32,24 @@ class Tower(pygame.sprite.Sprite):
         # Define variables for logic
         self.placed = False
 
-    def update(self, place=False):
+    def update(self, place=False, x=0, y=0):
         # Follow mouse cursor IF not placed yet
         if not self.placed:
             self.rect.center = pygame.mouse.get_pos()
             if place:
                 self.placed = True
+                self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
+                self.add(x, y)
         else:
+            if not place:  # Don't let the towers update if it's a place event
+                pass
             # Logic when placed
             pass
+
+    def add(self,  x, y):
+
+        arena[y][x] = self
+        # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
 
 
 class Text(pygame.sprite.Sprite):
@@ -94,6 +104,9 @@ running = True
 while running:
     # INPUT
     # Check Events
+    mousex, mousey = pygame.mouse.get_pos()
+    mousex, mousey = math.floor((mousex - 100) / 75), math.floor((mousey - 100) / 75)
+
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -105,7 +118,7 @@ while running:
         elif event.type == MOUSEBUTTONDOWN:
             mouse_buttons = pygame.mouse.get_pressed()
             if mouse_buttons[0]:
-                towers.update(True)
+                towers.update(True, mousex, mousey)
 
     # DRAWING
     # Wipe Screen to help Drawing
@@ -114,8 +127,12 @@ while running:
     # Draw filler elements
     pygame.draw.rect(screen, pink, pygame.Rect(0, 0, 100, SCREEN_HEIGHT))
     pygame.draw.rect(screen, pink, pygame.Rect(0, 0, SCREEN_WIDTH, 100))
-    pygame.draw.rect(screen, pink, pygame.Rect(0, SCREEN_HEIGHT-50, SCREEN_WIDTH, 50))
+    pygame.draw.rect(screen, pink, pygame.Rect(0, SCREEN_HEIGHT-125, SCREEN_WIDTH, 125))
     pygame.draw.rect(screen, pink, pygame.Rect(SCREEN_WIDTH-25, 0, 25, SCREEN_HEIGHT))
+    for i in range(9):
+        pygame.draw.rect(screen, pink, pygame.Rect(100 + (i * 75), 0, 2, SCREEN_HEIGHT))
+    for i in range(5):
+        pygame.draw.rect(screen, pink, pygame.Rect(0, 100 + (i * 75), SCREEN_WIDTH, 2))
 
     # Check over every sprite in sprite group all_sprites -> Draw them
     for entity in all_sprites:
@@ -124,8 +141,7 @@ while running:
 
     # Update Tower Logic
     towers.update()
-    x, y = pygame.mouse.get_pos()
-    debug.update(str(x) + " " + str(y))
+    debug.update(str(mousex) + " " + str(mousey))
 
     # Update the display
     pygame.display.flip()
