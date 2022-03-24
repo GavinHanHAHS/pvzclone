@@ -6,6 +6,7 @@
 
 import pygame
 import math
+import random
 
 # Import pygame.locals for easier access to key coordinates
 from pygame.locals import (
@@ -23,11 +24,14 @@ class Tower(pygame.sprite.Sprite):
         super(Tower, self).__init__()
 
         # Define variables for drawing
+        self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.surf = pygame.Surface((50, 50))
-        self.surf.fill((181, 126, 220))
+        self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center=(pygame.mouse.get_pos())
         )
+        self.surf.set_colorkey((255, 255, 255))
+        pygame.draw.circle(self.surf, self.colour, (25, 25), 25)
 
         # Define variables for logic
         self.placed = False
@@ -37,17 +41,16 @@ class Tower(pygame.sprite.Sprite):
         if not self.placed:
             self.rect.center = pygame.mouse.get_pos()
             if place:
-                self.placed = True
-                self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
-                self.add(x, y)
+                if arena[y][x] == 0:
+                    self.add(x, y)
         else:
             if not place:  # Don't let the towers update if it's a place event
                 pass
-            # Logic when placed
-            pass
+                # Logic when placed
 
-    def add(self,  x, y):
-
+    def add(self, x, y):
+        self.placed = True
+        self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
         arena[y][x] = self
         # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
 
