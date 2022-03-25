@@ -35,17 +35,22 @@ class Tower(pygame.sprite.Sprite):
 
         # Define variables for logic
         self.placed = False
+        self.timer = 0
 
     def update(self, place=False, x=0, y=0):
         # Follow mouse cursor IF not placed yet
         if not self.placed:
             self.rect.center = pygame.mouse.get_pos()
             if place:
-                if arena[y][x] == 0:
+                if 0 <= x <= 8 and 0 <= y <= 4 and arena[y][x] == 0:
                     self.add(x, y)
         else:
             if not place:  # Don't let the towers update if it's a place event
-                pass
+                if self.timer == 13: # shoot when timer is maxed out
+                    self.timer = 0
+                    self.shoot()
+                else:
+                    self.timer += 1
                 # Logic when placed
 
     def add(self, x, y):
@@ -53,6 +58,11 @@ class Tower(pygame.sprite.Sprite):
         self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
         arena[y][x] = self
         # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
+
+    def shoot(self):
+        newProjectile = Projectile(self)
+        projectiles.add(newProjectile)
+        all_sprites.add(newProjectile)
 
 
 class Text(pygame.sprite.Sprite):
@@ -66,6 +76,24 @@ class Text(pygame.sprite.Sprite):
     def update(self, newValue):
         self.value = newValue
         self.text = self.font.render(self.value, True, (0, 0, 0), (255, 255, 255))
+
+
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, tower):
+        super(Projectile, self).__init__()
+        self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.surf = pygame.Surface((10, 10))
+        self.surf.fill((255, 255, 255))
+        self.rect = (self.surf.get_rect(
+            center=(tower.rect.center[0], tower.rect.center[1] + random.randint(-5, 5))
+        ))
+        self.surf.set_colorkey((255, 255, 255))
+        pygame.draw.circle(self.surf, self.colour, (5, 5), 5)
+
+    def update(self):
+        self.rect.move_ip(5, 0)
+        if self.rect.left > SCREEN_WIDTH:
+            self.kill()
 
 
 # initialize pygame
@@ -101,6 +129,7 @@ debug = Text()
 # * all towers for logic
 all_sprites = pygame.sprite.Group()
 towers = pygame.sprite.Group()
+projectiles = pygame.sprite.Group()
 
 # Main Loop
 running = True
@@ -145,6 +174,8 @@ while running:
     # Update Tower Logic
     towers.update()
     debug.update(str(mousex) + " " + str(mousey))
+
+    projectiles.update()
 
     # Update the display
     pygame.display.flip()
