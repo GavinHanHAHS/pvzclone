@@ -26,16 +26,19 @@ class Tower(pygame.sprite.Sprite):
         # Define variables for drawing
         self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.surf = pygame.Surface((50, 50))
-        self.surf.fill((255, 255, 255))
+        self.surf.fill(self.colour)
+        #self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center=(pygame.mouse.get_pos())
         )
-        self.surf.set_colorkey((255, 255, 255))
-        pygame.draw.circle(self.surf, self.colour, (25, 25), 25)
+        # self.surf.set_colorkey((255, 255, 255))
+        # pygame.draw.circle(self.surf, self.colour, (25, 25), 25)
 
         # Define variables for logic
         self.placed = False
         self.timer = 0
+
+        self.xy = (False, False)
 
     def update(self, place=False, x=0, y=0):
         # Follow mouse cursor IF not placed yet
@@ -46,7 +49,7 @@ class Tower(pygame.sprite.Sprite):
                     self.add(x, y)
         else:
             if not place:  # Don't let the towers update if it's a place event
-                if self.timer == 13: # shoot when timer is maxed out
+                if self.timer == 23: # shoot when timer is maxed out
                     self.timer = 0
                     self.shoot()
                 else:
@@ -57,12 +60,17 @@ class Tower(pygame.sprite.Sprite):
         self.placed = True
         self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
         arena[y][x] = self
+        self.xy = (x, y)
         # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
 
     def shoot(self):
         newProjectile = Projectile(self)
         projectiles.add(newProjectile)
         all_sprites.add(newProjectile)
+
+    def delete(self):
+        arena[self.xy[1], self.xy[0]] = 0
+        self.kill()
 
 
 class Text(pygame.sprite.Sprite):
@@ -82,13 +90,13 @@ class Projectile(pygame.sprite.Sprite):
     def __init__(self, tower):
         super(Projectile, self).__init__()
         self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        self.surf = pygame.Surface((10, 10))
+        self.surf = pygame.Surface((15, 15))
         self.surf.fill((255, 255, 255))
         self.rect = (self.surf.get_rect(
-            center=(tower.rect.center[0], tower.rect.center[1] + random.randint(-5, 5))
+            center=(tower.rect.center[0], tower.rect.center[1] + random.randint(-15, 15))
         ))
         self.surf.set_colorkey((255, 255, 255))
-        pygame.draw.circle(self.surf, self.colour, (5, 5), 5)
+        pygame.draw.circle(self.surf, self.colour, (7.5, 7.5), 7.5)
 
     def update(self):
         self.rect.move_ip(5, 0)
