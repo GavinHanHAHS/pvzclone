@@ -89,7 +89,8 @@ class Text(pygame.sprite.Sprite):
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, tower):
         super(Projectile, self).__init__()
-        self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        # self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.colour = (0, 0, 0)
         self.surf = pygame.Surface((15, 15))
         self.surf.fill((255, 255, 255))
         self.rect = (self.surf.get_rect(
@@ -102,6 +103,30 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.move_ip(5, 0)
         if self.rect.left > SCREEN_WIDTH:
             self.kill()
+
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Enemy, self).__init__()
+
+        # Drawing Variables
+        self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        self.surf = pygame.Surface((40, 40))
+        self.rect = self.surf.get_rect(
+            center=(200, 220)
+        )
+        self.image = pygame.image.load("image/key.png").convert()
+        self.surf.blit(self.image, (0, 0))
+        self.surf.set_colorkey((255, 255, 255))
+        pygame.draw.circle(self.surf, self.colour, (20, 5), 5)
+
+        # Logic Variables
+        self.health = 2
+
+    def update(self):
+        if self.health <= 0:
+            self.kill()
+
 
 
 # initialize pygame
@@ -138,6 +163,7 @@ debug = Text()
 all_sprites = pygame.sprite.Group()
 towers = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 
 # Main Loop
 running = True
@@ -155,6 +181,10 @@ while running:
                 new_tower = Tower()
                 towers.add(new_tower)
                 all_sprites.add(new_tower)
+            elif event.key == pygame.K_b:
+                new_enemy = Enemy()
+                enemies.add(new_enemy)
+                all_sprites.add(new_enemy)
         elif event.type == MOUSEBUTTONDOWN:
             mouse_buttons = pygame.mouse.get_pressed()
             if mouse_buttons[0]:
@@ -184,6 +214,16 @@ while running:
     debug.update(str(mousex) + " " + str(mousey))
 
     projectiles.update()
+    enemies.update()
+
+    # Handle projectile collision
+    collision = pygame.sprite.groupcollide(enemies, projectiles, False, False)
+    for enemy, projectilescollided in collision.items(): # This assumes only one projectile is colliding at once (the list projectilescollided is a list of every collided projectile)
+        if projectilescollided[0].rect.left >= enemy.rect.left + 10:
+            # projectilescollided[0].colour = (0, 0, 0)
+            # projectilescollided[0].surf.fill(projectilescollided[0].colour)
+            enemy.health -= 1
+            projectilescollided[0].kill()
 
     # Update the display
     pygame.display.flip()
