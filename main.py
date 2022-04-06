@@ -15,6 +15,12 @@ from pygame.locals import (
     QUIT,
 )
 
+# Features in my head
+# Click button -> Add shovel item
+# If click with shovel item; delete shovel item + tower in location
+# Seed slots...
+# -> tower subclass? leave placing code in "tower" and add attack_tower and produce_tower etc
+#Objects
 
 # Define a tower object by extending pygame.sprite.Sprite
 # the surface(s) drawn on the screen is an attribute of "Tower"
@@ -49,7 +55,7 @@ class Tower(pygame.sprite.Sprite):
                     self.add(x, y)
         else:
             if not place:  # Don't let the towers update if it's a place event
-                if self.timer == 23: # shoot when timer is maxed out
+                if self.timer == 43: # shoot when timer is maxed out
                     self.timer = 0
                     self.shoot()
                 else:
@@ -64,9 +70,10 @@ class Tower(pygame.sprite.Sprite):
         # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
 
     def shoot(self):
-        newProjectile = Projectile(self)
-        projectiles.add(newProjectile)
-        all_sprites.add(newProjectile)
+        if enemy_row[self.xy[1]] != 0:
+            newProjectile = Projectile(self)
+            projectiles.add(newProjectile)
+            all_sprites.add(newProjectile)
 
     def delete(self):
         arena[self.xy[1], self.xy[0]] = 0
@@ -106,14 +113,14 @@ class Projectile(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, location):
         super(Enemy, self).__init__()
 
         # Drawing Variables
         self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.surf = pygame.Surface((40, 40))
         self.rect = self.surf.get_rect(
-            center=(200, 220)
+            center=(850, 70 + (75 * location))
         )
         self.image = pygame.image.load("image/key.png").convert()
         self.surf.blit(self.image, (0, 0))
@@ -121,12 +128,16 @@ class Enemy(pygame.sprite.Sprite):
         pygame.draw.circle(self.surf, self.colour, (20, 5), 5)
 
         # Logic Variables
-        self.health = 2
+        self.health = 2 + random.randint(2, 5)
+        self.row = location - 1
+        enemy_row[self.row] += 1
 
     def update(self):
-        if self.health <= 0:
+        if self.health <= 0 or self.rect.right < 0:
+            enemy_row[self.row] -= 1
             self.kill()
-
+        else:
+            self.rect.move_ip(-1, 0)
 
 
 # initialize pygame
@@ -152,6 +163,12 @@ arena = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0, 0],
          [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+# Are there enemies in the row it's in?
+enemy_row = [0, 0, 0, 0, 0]
+# continues to shoot even while enemies are behind;
+# maybe add a Line of Sight object attached to the tower object that groupcollides?
+
 
 pink = (227, 143, 224)
 
@@ -182,7 +199,7 @@ while running:
                 towers.add(new_tower)
                 all_sprites.add(new_tower)
             elif event.key == pygame.K_b:
-                new_enemy = Enemy()
+                new_enemy = Enemy(random.randint(1, 5))
                 enemies.add(new_enemy)
                 all_sprites.add(new_enemy)
         elif event.type == MOUSEBUTTONDOWN:
@@ -211,7 +228,8 @@ while running:
 
     # Update Tower Logic
     towers.update()
-    debug.update(str(mousex) + " " + str(mousey))
+    # debug.update(str(mousex) + " " + str(mousey))
+    debug.update(str(enemy_row))
 
     projectiles.update()
     enemies.update()
