@@ -19,8 +19,9 @@ from pygame.locals import (
 # Click button -> Add shovel item
 # If click with shovel item; delete shovel item + tower in location
 # Seed slots...
-# -> tower subclass? leave placing code in "tower" and add attack_tower and produce_tower etc
-#Objects
+# Line of Sight objects
+# Vfx objects (particle)
+# pygame.rect(rect of .collidepoint(pygame.mouse.get_pos())
 
 # Define a tower object by extending pygame.sprite.Sprite
 # the surface(s) drawn on the screen is an attribute of "Tower"
@@ -33,7 +34,7 @@ class Tower(pygame.sprite.Sprite):
         self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.surf = pygame.Surface((50, 50))
         self.surf.fill(self.colour)
-        #self.surf.fill((255, 255, 255))
+        # self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center=(pygame.mouse.get_pos())
         )
@@ -54,13 +55,9 @@ class Tower(pygame.sprite.Sprite):
                 if 0 <= x <= 8 and 0 <= y <= 4 and arena[y][x] == 0:
                     self.add(x, y)
         else:
+            # Tower Logic After Placed.
             if not place:  # Don't let the towers update if it's a place event
-                if self.timer == 43: # shoot when timer is maxed out
-                    self.timer = 0
-                    self.shoot()
-                else:
-                    self.timer += 1
-                # Logic when placed
+                self.mechanic()
 
     def add(self, x, y):
         self.placed = True
@@ -69,15 +66,29 @@ class Tower(pygame.sprite.Sprite):
         self.xy = (x, y)
         # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
 
+    def delete(self):
+        print(self.xy)
+        arena[self.xy[1], self.xy[0]] = 0
+        self.kill()
+
+    def mechanic(self):
+        pass
+
+
+class Shooter(Tower):
+    # Tower subclass that shoots
+    def mechanic(self):
+        if self.timer == 43:  # shoot when timer is maxed out
+            self.timer = 0
+            self.shoot()
+        else:
+            self.timer += 1
+
     def shoot(self):
         if enemy_row[self.xy[1]] != 0:
             newProjectile = Projectile(self)
             projectiles.add(newProjectile)
             all_sprites.add(newProjectile)
-
-    def delete(self):
-        arena[self.xy[1], self.xy[0]] = 0
-        self.kill()
 
 
 class Text(pygame.sprite.Sprite):
@@ -195,7 +206,7 @@ while running:
             running = False
         elif event.type == KEYDOWN:
             if event.key == pygame.K_a:
-                new_tower = Tower()
+                new_tower = Shooter()
                 towers.add(new_tower)
                 all_sprites.add(new_tower)
             elif event.key == pygame.K_b:
