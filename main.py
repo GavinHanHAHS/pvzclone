@@ -18,7 +18,7 @@ from pygame.locals import (
 # Features in my head
 # Click button -> Add shovel item
 # If click with shovel item; delete shovel item + tower in location
-# Seed slots...
+# Seed slot class, to make seed slot objects.
 # Line of Sight objects
 # Vfx objects (particle)
 # pygame.rect(rect of .collidepoint(pygame.mouse.get_pos())
