@@ -15,6 +15,7 @@ from pygame.locals import (
     QUIT,
 )
 
+
 # Features in my head
 # Click button -> Add shovel item
 # If click with shovel item; delete shovel item + tower in location
@@ -52,23 +53,25 @@ class Tower(pygame.sprite.Sprite):
         if not self.placed:
             self.rect.center = pygame.mouse.get_pos()
             if place:
-                if 0 <= x <= 8 and 0 <= y <= 4 and arena[y][x] == 0:
+                if 0 <= x <= 8 and 0 <= y <= 4:
                     self.add(x, y)
+                else:
+                    self.kill()
         else:
             # Tower Logic After Placed.
             if not place:  # Don't let the towers update if it's a place event
                 self.mechanic()
 
     def add(self, x, y):
-        self.placed = True
-        self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
-        arena[y][x] = self
-        self.xy = (x, y)
-        # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
+        if arena[y][x] == 0:
+            self.placed = True
+            self.rect.topleft = (113 + (x * 75), 113 + (y * 75))
+            arena[y][x] = self
+            self.xy = (x, y)
+            # print(arena, str(math.floor((mousex - 100)/75)), str(math.floor((mousey - 100)/75)))
 
     def delete(self):
-        print(self.xy)
-        arena[self.xy[1], self.xy[0]] = 0
+        arena[self.xy[1]][self.xy[0]] = 0
         self.kill()
 
     def mechanic(self):
@@ -89,6 +92,37 @@ class Shooter(Tower):
             newProjectile = Projectile(self)
             projectiles.add(newProjectile)
             all_sprites.add(newProjectile)
+
+
+class OverrideTower(Tower):
+    # Anything that must be placed onto another tower rather than an empty square
+    def __init__(self):
+        super().__init__()
+        self.required_tower = "Class of object for override"
+
+    def add(self, x, y):
+        # Check if object clicked is the tower needed to override
+        if isinstance(arena[y][x], self.required_tower):
+            self.add_mechanic(x, y)
+        else:
+            # Delete self else
+            self.kill()
+
+    def add_mechanic(self, x, y):
+        # What to do when adding object? by default, just inserts this object over it
+        super().add(x, y)
+
+
+class Shovel(OverrideTower):
+    def __init__(self):
+        super().__init__()
+
+        # Redefine required tower to be ANY tower
+        self.required_tower = Tower
+
+    def add_mechanic(self, x, y):
+        arena[y][x].delete()
+        self.kill()
 
 
 class Text(pygame.sprite.Sprite):
@@ -213,6 +247,10 @@ while running:
                 new_enemy = Enemy(random.randint(1, 5))
                 enemies.add(new_enemy)
                 all_sprites.add(new_enemy)
+            elif event.key == pygame.K_c:
+                new_shovel = Shovel()
+                towers.add(new_shovel)
+                all_sprites.add(new_shovel)
         elif event.type == MOUSEBUTTONDOWN:
             mouse_buttons = pygame.mouse.get_pressed()
             if mouse_buttons[0]:
