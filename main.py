@@ -247,6 +247,26 @@ while running:
                 new_enemy = Enemy(random.randint(1, 5))
                 enemies.add(new_enemy)
                 all_sprites.add(new_enemy)
+            elif event.key == pygame.K_1:
+                new_enemy = Enemy(1)
+                enemies.add(new_enemy)
+                all_sprites.add(new_enemy)
+            elif event.key == pygame.K_2:
+                new_enemy = Enemy(2)
+                enemies.add(new_enemy)
+                all_sprites.add(new_enemy)
+            elif event.key == pygame.K_3:
+                new_enemy = Enemy(3)
+                enemies.add(new_enemy)
+                all_sprites.add(new_enemy)
+            elif event.key == pygame.K_4:
+                new_enemy = Enemy(4)
+                enemies.add(new_enemy)
+                all_sprites.add(new_enemy)
+            elif event.key == pygame.K_5:
+                new_enemy = Enemy(5)
+                enemies.add(new_enemy)
+                all_sprites.add(new_enemy)
             elif event.key == pygame.K_c:
                 new_shovel = Shovel()
                 towers.add(new_shovel)
