@@ -34,12 +34,16 @@ class Tower(pygame.sprite.Sprite):
         # Define variables for drawing
         self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.surf = pygame.Surface((50, 50))
-        self.surf.fill(self.colour)
-        # self.surf.fill((255, 255, 255))
+        self.image = pygame.image.load("image/gorilla_idle.png").convert_alpha()
+        self.image2 = pygame.image.load("image/gorilla_shoot.png").convert_alpha()
+        self.state = 0
+        # self.surf.fill(self.colour)
+        self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect(
             center=(pygame.mouse.get_pos())
         )
-        # self.surf.set_colorkey((255, 255, 255))
+        self.surf.blit(self.image, (0, 0))
+        self.surf.set_colorkey((255, 255, 255))
         # pygame.draw.circle(self.surf, self.colour, (25, 25), 25)
 
         # Define variables for logic
@@ -86,9 +90,15 @@ class Shooter(Tower):
             self.shoot()
         else:
             self.timer += 1
+            if self.timer == 18 and self.state == 1:
+                self.state = 0
+                self.surf.fill((255, 255, 255))
+                self.surf.blit(self.image, (0, 0))
 
     def shoot(self):
         if enemy_row[self.xy[1]] != 0:
+            self.surf.blit(self.image2, (0, 0))
+            self.state = 1
             newProjectile = Projectile(self)
             projectiles.add(newProjectile)
             all_sprites.add(newProjectile)
@@ -98,6 +108,7 @@ class OverrideTower(Tower):
     # Anything that must be placed onto another tower rather than an empty square
     def __init__(self):
         super().__init__()
+
         self.required_tower = "Class of object for override"
 
     def add(self, x, y):
@@ -116,7 +127,9 @@ class OverrideTower(Tower):
 class Shovel(OverrideTower):
     def __init__(self):
         super().__init__()
-
+        self.image = pygame.image.load("image/net.png").convert_alpha()
+        self.surf.fill((255, 255, 255))
+        self.surf.blit(self.image, (0, 0))
         # Redefine required tower to be ANY tower
         self.required_tower = Tower
 
@@ -146,7 +159,7 @@ class Projectile(pygame.sprite.Sprite):
         self.surf = pygame.Surface((15, 15))
         self.surf.fill((255, 255, 255))
         self.rect = (self.surf.get_rect(
-            center=(tower.rect.center[0], tower.rect.center[1] + random.randint(-15, 15))
+            center=(tower.rect.center[0], tower.rect.center[1] + random.randint(-7, 3))
         ))
         self.surf.set_colorkey((255, 255, 255))
         pygame.draw.circle(self.surf, self.colour, (7.5, 7.5), 7.5)
