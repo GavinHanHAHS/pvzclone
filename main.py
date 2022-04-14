@@ -3,7 +3,6 @@
 # Github link: https://github.com/GavinHanHAHS/pvzclone
 
 # import packages needed for project
-
 import pygame
 import math
 import random
@@ -165,7 +164,7 @@ class Projectile(pygame.sprite.Sprite):
         pygame.draw.circle(self.surf, self.colour, (7.5, 7.5), 7.5)
 
     def update(self):
-        self.rect.move_ip(5, 0)
+        self.rect.move_ip(7, 0)
         if self.rect.left > SCREEN_WIDTH:
             self.kill()
 
@@ -211,6 +210,13 @@ SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("PvZClone")
 
+# Set Icon for Window
+icon = pygame.image.load("image/icon.png").convert_alpha()
+pygame.display.set_icon(icon)
+
+# Image to draw to "Background"
+bg = pygame.image.load("image/bg.png").convert()
+
 # Setup the clock for a decent framerate
 clock = pygame.time.Clock()
 
@@ -230,7 +236,7 @@ enemy_row = [0, 0, 0, 0, 0]
 
 pink = (227, 143, 224)
 
-debug = Text()
+# debug = Text()
 
 # Define a group to hold
 # * all sprites for drawing
@@ -239,6 +245,14 @@ all_sprites = pygame.sprite.Group()
 towers = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
+
+
+# Helpful Functions
+def add_enemy(row):
+    new_enemy = Enemy(row)
+    enemies.add(new_enemy)
+    all_sprites.add(new_enemy)
+
 
 # Main Loop
 running = True
@@ -257,29 +271,17 @@ while running:
                 towers.add(new_tower)
                 all_sprites.add(new_tower)
             elif event.key == pygame.K_b:
-                new_enemy = Enemy(random.randint(1, 5))
-                enemies.add(new_enemy)
-                all_sprites.add(new_enemy)
+                add_enemy(random.randint(1, 5))
             elif event.key == pygame.K_1:
-                new_enemy = Enemy(1)
-                enemies.add(new_enemy)
-                all_sprites.add(new_enemy)
+                add_enemy(1)
             elif event.key == pygame.K_2:
-                new_enemy = Enemy(2)
-                enemies.add(new_enemy)
-                all_sprites.add(new_enemy)
+                add_enemy(2)
             elif event.key == pygame.K_3:
-                new_enemy = Enemy(3)
-                enemies.add(new_enemy)
-                all_sprites.add(new_enemy)
+                add_enemy(3)
             elif event.key == pygame.K_4:
-                new_enemy = Enemy(4)
-                enemies.add(new_enemy)
-                all_sprites.add(new_enemy)
+                add_enemy(4)
             elif event.key == pygame.K_5:
-                new_enemy = Enemy(5)
-                enemies.add(new_enemy)
-                all_sprites.add(new_enemy)
+                add_enemy(5)
             elif event.key == pygame.K_c:
                 new_shovel = Shovel()
                 towers.add(new_shovel)
@@ -291,27 +293,28 @@ while running:
 
     # DRAWING
     # Wipe Screen to help Drawing
-    screen.fill((220, 220, 220))
+    screen.blit(bg, (0, 0))
+    # screen.fill((220, 220, 220))
 
     # Draw filler elements
-    pygame.draw.rect(screen, pink, pygame.Rect(0, 0, 100, SCREEN_HEIGHT))
-    pygame.draw.rect(screen, pink, pygame.Rect(0, 0, SCREEN_WIDTH, 100))
-    pygame.draw.rect(screen, pink, pygame.Rect(0, SCREEN_HEIGHT-125, SCREEN_WIDTH, 125))
-    pygame.draw.rect(screen, pink, pygame.Rect(SCREEN_WIDTH-25, 0, 25, SCREEN_HEIGHT))
-    for i in range(9):
-        pygame.draw.rect(screen, pink, pygame.Rect(100 + (i * 75), 0, 2, SCREEN_HEIGHT))
-    for i in range(5):
-        pygame.draw.rect(screen, pink, pygame.Rect(0, 100 + (i * 75), SCREEN_WIDTH, 2))
+    # pygame.draw.rect(screen, pink, pygame.Rect(0, 0, 100, SCREEN_HEIGHT))
+    # pygame.draw.rect(screen, pink, pygame.Rect(0, 0, SCREEN_WIDTH, 100))
+    # pygame.draw.rect(screen, pink, pygame.Rect(0, SCREEN_HEIGHT-125, SCREEN_WIDTH, 125))
+    # pygame.draw.rect(screen, pink, pygame.Rect(SCREEN_WIDTH-25, 0, 25, SCREEN_HEIGHT))
+    # for i in range(9):
+    #     pygame.draw.rect(screen, pink, pygame.Rect(100 + (i * 75), 0, 2, SCREEN_HEIGHT))
+    # for i in range(5):
+    #     pygame.draw.rect(screen, pink, pygame.Rect(0, 100 + (i * 75), SCREEN_WIDTH, 2))
 
     # Check over every sprite in sprite group all_sprites -> Draw them
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
-    screen.blit(debug.text, debug.rect)
+    # screen.blit(debug.text, debug.rect)
 
     # Update Tower Logic
     towers.update()
     # debug.update(str(mousex) + " " + str(mousey))
-    debug.update(str(enemy_row))
+    # debug.update(str(enemy_row))
 
     projectiles.update()
     enemies.update()
@@ -330,3 +333,6 @@ while running:
 
     # Ensure program maintains a good frame rate
     clock.tick(60)
+
+
+
