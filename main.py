@@ -124,6 +124,7 @@ class OverrideTower(Tower):
 
 
 class Shovel(OverrideTower):
+    # Placed on any tower that exists, deletes tower then self
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("image/net.png").convert_alpha()
@@ -138,6 +139,7 @@ class Shovel(OverrideTower):
 
 
 class Text(pygame.sprite.Sprite):
+    # Text just in case (mostly debug)
     def __init__(self):
         super(Text, self).__init__()
         self.value = "hold"
@@ -151,6 +153,7 @@ class Text(pygame.sprite.Sprite):
 
 
 class Projectile(pygame.sprite.Sprite):
+    # Projectile shot by Shooters
     def __init__(self, tower):
         super(Projectile, self).__init__()
         # self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -170,6 +173,7 @@ class Projectile(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
+    # Enemy that spawns on right side of screen and slowly moves left
     def __init__(self, location):
         super(Enemy, self).__init__()
 
@@ -267,10 +271,12 @@ while running:
             running = False
         elif event.type == KEYDOWN:
             if event.key == pygame.K_a:
+                # Make a new tower & add to cursor
                 new_tower = Shooter()
                 towers.add(new_tower)
                 all_sprites.add(new_tower)
             elif event.key == pygame.K_b:
+                # make enemies spawn randomly OR on specific rows
                 add_enemy(random.randint(1, 5))
             elif event.key == pygame.K_1:
                 add_enemy(1)
@@ -283,12 +289,14 @@ while running:
             elif event.key == pygame.K_5:
                 add_enemy(5)
             elif event.key == pygame.K_c:
+                # Make a shovel object to delete towers
                 new_shovel = Shovel()
                 towers.add(new_shovel)
                 all_sprites.add(new_shovel)
         elif event.type == MOUSEBUTTONDOWN:
             mouse_buttons = pygame.mouse.get_pressed()
             if mouse_buttons[0]:
+                # If left click, give towers the appropriate information to process
                 towers.update(True, mousex, mousey)
 
     # DRAWING
@@ -321,12 +329,14 @@ while running:
 
     # Handle projectile collision
     collision = pygame.sprite.groupcollide(enemies, projectiles, False, False)
-    for enemy, projectilescollided in collision.items(): # This assumes only one projectile is colliding at once (the list projectilescollided is a list of every collided projectile)
-        if projectilescollided[0].rect.left >= enemy.rect.left + 10:
-            # projectilescollided[0].colour = (0, 0, 0)
-            # projectilescollided[0].surf.fill(projectilescollided[0].colour)
+
+    # for loops through a dictionary, enemy is key, projectile is value
+    for enemy, projectile in collision.items():
+        if projectile[0].rect.left >= enemy.rect.left + 10:
+            # When the projectile goes into an appropriate amount of distance into
+            # the sprite (aesthetics) delete the projectile and decrease enemy health
             enemy.health -= 1
-            projectilescollided[0].kill()
+            projectile[0].kill()
 
     # Update the display
     pygame.display.flip()
