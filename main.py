@@ -17,11 +17,11 @@ from pygame.locals import (
 
 # Features in my head
 # Click button -> Add shovel item
-# If click with shovel item; delete shovel item + tower in location
-# Seed slot class, to make seed slot objects.
+# Seed slot class, to make seed slot objects. -> shovel item? both is intrinsically "add item"
+# rect.collidepoint(pygame.mouse.get_pos() will check if a point is inside a rect
 # Line of Sight objects
-# Vfx objects (particle)
-# pygame.rect(rect of .collidepoint(pygame.mouse.get_pos())
+# Vfx objects (particle) -> spritesheet?
+
 
 # Define a tower object by extending pygame.sprite.Sprite
 # the surface(s) drawn on the screen is an attribute of "Tower"
