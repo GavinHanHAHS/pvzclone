@@ -152,6 +152,25 @@ class Text(pygame.sprite.Sprite):
         self.text = self.font.render(self.value, True, (0, 0, 0), (255, 255, 255))
 
 
+class TowerSlot(pygame.sprite.Sprite):
+    # clickable object that puts a tower into your hands.
+    def __init__(self):
+        super().__init__()
+        self.surf = pygame.Surface((40, 60))
+        self.surf.fill((255, 255, 255))
+        self.rect = self.surf.get_rect(
+            center=(80, 120)
+        )
+
+    def update(self, click = False):
+        if self.rect.collidepoint(pygame.mouse.get_pos()) and click == True:
+            self.add_tower()
+
+    def add_tower(self):
+        new_tower = Shooter()
+        towers.add(new_tower)
+        all_sprites.add(new_tower)
+
 class Projectile(pygame.sprite.Sprite):
     # Projectile shot by Shooters
     def __init__(self, tower):
@@ -258,6 +277,10 @@ def add_enemy(row):
     all_sprites.add(new_enemy)
 
 
+seedslot = TowerSlot()
+all_sprites.add(seedslot)
+
+
 # Main Loop
 running = True
 while running:
@@ -298,6 +321,7 @@ while running:
             if mouse_buttons[0]:
                 # If left click, give towers the appropriate information to process
                 towers.update(True, mousex, mousey)
+                seedslot.update(True)
 
     # DRAWING
     # Wipe Screen to help Drawing
