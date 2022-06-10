@@ -328,16 +328,6 @@ while running:
     screen.blit(bg, (0, 0))
     # screen.fill((220, 220, 220))
 
-    # Draw filler elements
-    # pygame.draw.rect(screen, pink, pygame.Rect(0, 0, 100, SCREEN_HEIGHT))
-    # pygame.draw.rect(screen, pink, pygame.Rect(0, 0, SCREEN_WIDTH, 100))
-    # pygame.draw.rect(screen, pink, pygame.Rect(0, SCREEN_HEIGHT-125, SCREEN_WIDTH, 125))
-    # pygame.draw.rect(screen, pink, pygame.Rect(SCREEN_WIDTH-25, 0, 25, SCREEN_HEIGHT))
-    # for i in range(9):
-    #     pygame.draw.rect(screen, pink, pygame.Rect(100 + (i * 75), 0, 2, SCREEN_HEIGHT))
-    # for i in range(5):
-    #     pygame.draw.rect(screen, pink, pygame.Rect(0, 100 + (i * 75), SCREEN_WIDTH, 2))
-
     # Check over every sprite in sprite group all_sprites -> Draw them
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
