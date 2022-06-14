@@ -336,8 +336,6 @@ while running:
 
     # Update Tower Logic
     towers.update()
-    # debug.update(str(mousex) + " " + str(mousey))
-    # debug.update(str(enemy_row))
 
     projectiles.update()
     enemies.update()
