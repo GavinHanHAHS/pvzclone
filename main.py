@@ -171,6 +171,7 @@ class TowerSlot(pygame.sprite.Sprite):
         towers.add(new_tower)
         all_sprites.add(new_tower)
 
+
 class Projectile(pygame.sprite.Sprite):
     # Projectile shot by Shooters
     def __init__(self, tower):
